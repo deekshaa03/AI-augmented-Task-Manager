@@ -1,21 +1,20 @@
+# ------------------ Imports ------------------
 import streamlit as st
 import requests
 from datetime import datetime, time
-import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 
-# Refresh every 60 seconds (60,000 ms)
-st_autorefresh(interval=60_000, key="reminder_refresh")
-
-
-# ---------------------- Backend URL ----------------------
-BACKEND_URL = "http://127.0.0.1:8000"
-
-# ---------------------- Page Config ----------------------
+# ------------------ Streamlit Config ------------------
 st.set_page_config(page_title="AI Task Manager", layout="wide")
 st.title("📝 AI Task Manager Agent")
 
-# ---------------------- Session State ----------------------
+# ------------------ Auto Refresh ------------------
+st_autorefresh(interval=60_000, key="reminder_refresh")  # Refresh every 60 seconds
+
+# ------------------ Backend URL ------------------
+BACKEND_URL = "http://127.0.0.1:8000"
+
+# ------------------ Session State ------------------
 if "tasks" not in st.session_state:
     st.session_state.tasks = []
 if "confirm_delete" not in st.session_state:
@@ -23,9 +22,9 @@ if "confirm_delete" not in st.session_state:
 if "edit_task_id" not in st.session_state:
     st.session_state.edit_task_id = None
 if "refresh" not in st.session_state:
-    st.session_state.refresh = False  # used to trigger refresh
+    st.session_state.refresh = False
 
-# ---------------------- Helper Functions ----------------------
+# ------------------ Helper Functions ------------------
 def load_tasks():
     try:
         r = requests.get(f"{BACKEND_URL}/tasks")
@@ -34,9 +33,9 @@ def load_tasks():
         else:
             st.error(f"❌ Error loading tasks: {r.text}")
     except requests.exceptions.ConnectionError:
-        st.error(f"❌ Backend not reachable at {BACKEND_URL}. Please ensure your backend is running.")
+        st.error(f"❌ Backend not reachable at {BACKEND_URL}.")
     except Exception as e:
-        st.error(f"❌ Unexpected error loading tasks: {str(e)}")
+        st.error(f"❌ Unexpected error: {str(e)}")
 
 def parse_time_input(time_str: str) -> time:
     time_str = time_str.strip()
@@ -60,14 +59,14 @@ def check_reminders():
 def trigger_refresh():
     st.session_state['refresh'] = not st.session_state['refresh']
 
-# ---------------------- Load tasks initially ----------------------
+# ------------------ Initial Load ------------------
 if not st.session_state.tasks:
     load_tasks()
 
-# ---------------------- Tabs ----------------------
+# ------------------ Tabs ------------------
 tab1, tab2 = st.tabs(["📋 Tasks", "🤖 AI Suggestions"])
 
-# ---------------------- TAB 1: TASKS ----------------------
+# ------------------ TAB 1: Tasks ------------------
 with tab1:
     st.header("➕ Add a New Task")
     with st.expander("Click to Add Task"):
@@ -86,7 +85,7 @@ with tab1:
                 reminder_time = st.text_input("Reminder Time", placeholder="e.g., 2:30 PM or 14:30", value="12:00 PM")
             with col5:
                 set_reminder = st.checkbox("Set Reminder", value=True)
-            
+
             submitted = st.form_submit_button("✅ Add Task")
 
         if submitted:
@@ -107,7 +106,7 @@ with tab1:
                     r = requests.post(f"{BACKEND_URL}/tasks", json=payload)
                     if r.status_code == 200:
                         st.success("✅ Task added successfully!")
-                        trigger_refresh()  # refresh Streamlit
+                        trigger_refresh()
                     else:
                         st.error(f"❌ Error adding task: {r.text}")
                 except Exception as e:
@@ -146,22 +145,21 @@ with tab1:
                 st.markdown(f"<h4 style='{style}'>{priority_icon} {task['title']}</h4>", unsafe_allow_html=True)
                 st.write(f"**Status:** {status_text}")
                 st.caption(f"📅 Reminder: {reminder_str} | Priority: {task['priority']}")
-                
+
                 col1, col2, col3 = st.columns(3)
                 
                 # Mark Complete
                 with col1:
-                    if not completed:
-                        if st.button("✅ Mark Complete", key=f"complete_{task['id']}"):
-                            try:
-                                r = requests.put(f"{BACKEND_URL}/tasks/{task['id']}", json={"completed": True})
-                                if r.status_code == 200:
-                                    st.success("Task marked complete!")
-                                    trigger_refresh()
-                                else:
-                                    st.error(f"Error: {r.text}")
-                            except Exception as e:
-                                st.error(f"Unexpected error: {str(e)}")
+                    if not completed and st.button("✅ Mark Complete", key=f"complete_{task['id']}"):
+                        try:
+                            r = requests.put(f"{BACKEND_URL}/tasks/{task['id']}", json={"completed": True})
+                            if r.status_code == 200:
+                                st.success("Task marked complete!")
+                                trigger_refresh()
+                            else:
+                                st.error(f"Error: {r.text}")
+                        except Exception as e:
+                            st.error(f"Unexpected error: {str(e)}")
 
                 # Edit Task
                 with col2:
@@ -219,9 +217,9 @@ with tab1:
                             if st.button("Yes", key=f"yes_{task['id']}"):
                                 try:
                                     r = requests.delete(f"{BACKEND_URL}/tasks/{task['id']}")
-                                    if r.status_code==200:
+                                    if r.status_code == 200:
                                         st.success("Task deleted!")
-                                        st.session_state.confirm_delete[confirm_key]=False
+                                        st.session_state.confirm_delete[confirm_key] = False
                                         trigger_refresh()
                                     else:
                                         st.error(f"Error: {r.text}")
@@ -229,15 +227,16 @@ with tab1:
                                     st.error(f"Unexpected error: {str(e)}")
                         with c2:
                             if st.button("Cancel", key=f"cancel_{task['id']}"):
-                                st.session_state.confirm_delete[confirm_key]=False
+                                st.session_state.confirm_delete[confirm_key] = False
                                 st.info("Cancelled")
+
     else:
         st.info("No tasks found. Add one above!")
 
     # Check reminders
     check_reminders()
 
-# ------------------ TAB 2: AI SUGGESTIONS ------------------
+# ------------------ TAB 2: AI Suggestions ------------------
 with tab2:
     st.header("🤖 AI Task Suggestions")
     with st.expander("Get Suggestions based on your work"):
@@ -264,7 +263,7 @@ with tab2:
                     else:
                         st.error(f"Error from backend: {r.text}")
                 except requests.exceptions.ConnectionError:
-                    st.error(f"❌ Backend not reachable at {BACKEND_URL}. Please ensure your backend is running.")
+                    st.error(f"❌ Backend not reachable at {BACKEND_URL}.")
                 except Exception as e:
                     st.error(f"❌ Unexpected error: {str(e)}")
             else:

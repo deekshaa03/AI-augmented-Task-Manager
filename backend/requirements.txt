@@ -1,0 +1,8 @@
+streamlit
+requests
+streamlit-autorefresh
+sqlmodel
+fastapi
+uvicorn
+httpx
+python-dotenv
