@@ -12,7 +12,7 @@ st.title("📝 AI Task Manager Agent")
 st_autorefresh(interval=60_000, key="reminder_refresh")  # Refresh every 60 seconds
 
 # ------------------ Backend URL ------------------
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "https://ai-augmented-task-manager.onrender.com"
 
 # ------------------ Session State ------------------
 if "tasks" not in st.session_state:
