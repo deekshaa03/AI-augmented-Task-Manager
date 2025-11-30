@@ -34,7 +34,7 @@ AI Task Manager Agent is an AI-augmented task manager that helps users efficient
 
 1. **Clone the repository**
 
-git clone <repository_url>
+git clone https://github.com/deekshaa03/AI-augmented-Task-Manager.git
 cd AI-Task-Manager-Agent
 
 2. **Install dependencies:**
@@ -55,22 +55,9 @@ streamlit run app.py
 ---
 
 ## Usage instructions
-Explain how to use the app:
-## Usage
 - Tasks Tab: Add, edit, delete tasks, mark tasks as complete, search, and sort tasks.
 - AI Suggestions Tab: Enter a description of your current work to get AI-generated task suggestions.
 - Reminders appear if the app is running.
-
----
-
-## Project Structure
-AI-Task-Manager-Agent/
-├─ app.py             # Streamlit frontend
-├─ main.py            # FastAPI backend
-├─ tasks.db           # SQLite database (auto-created)
-├─ .env               # Environment variables 
-├─ requirements.txt   # Python dependencies
-└─ README.md          # Project documentation
 
 ---
 
@@ -83,4 +70,4 @@ AI-Task-Manager-Agent/
 ---
 
 ## Contact
-For questions or suggestions, contact Me at deekshakotian928@gmail.com.
+For questions or suggestions, contact Me at deekshakotian928@gmail.com
